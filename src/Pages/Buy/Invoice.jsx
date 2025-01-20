@@ -36,9 +36,7 @@ const Invoice = () => {
   const handleGetUlasan = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/reviews/ProductAndOrder/${id}/${
-          invoice?.OrderItems[0]?.productId || 1
-        }`,
+        `http://localhost:5000/api/reviews/order/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("tokenUser")}`,
@@ -107,7 +105,7 @@ const Invoice = () => {
           orderId: id,
         }
       );
-      if (response.data.message === "Order status updated successfully") {
+      if (response.data.message === "Order status and product stock updated successfully") {
         navigate("/order-list");
         alert("pesanan di terima");
       }
@@ -138,6 +136,47 @@ const Invoice = () => {
     }
   };
 
+  const isAllPaymentsCompleted = invoice?.Payments?.every(
+    (payment) => payment.paymentStatus === "Completed"
+  );
+
+  const buttonStyle = {
+    padding: "5px 4px",
+    backgroundColor: "GrayText",
+    borderRadius: "8px",
+    marginRight: "10px",
+  };
+
+  const containerStyle = {
+    display: "flex",
+    gap: "30px",
+  };
+
+  const sectionStyle = {
+    marginTop: "30px",
+  };
+
+  const titleStyle = {
+    fontSize: "20px",
+  };
+
+  const statusStyle = {
+    fontSize: "14px",
+    padding: "2px",
+    backgroundColor: "ButtonHighlight",
+    width: "150px",
+    textAlign: "center",
+    borderRadius: "10px",
+  };
+
+  const buttonStyleS = {
+    height: "30px",
+    display: "flex",
+    alignItems: "center",
+  };
+
+  const shippingStatus = invoice?.Shipment?.shippingStatus;
+  console.log(invoice?.status, invoice?.Shipment?.shippingStatus, "cek status")
   return (
     <Container className="mt-4">
       <h2>Invoice</h2>
@@ -207,152 +246,70 @@ const Invoice = () => {
           </Table>
         </Col>
       </Row>
-      {invoice?.Payments?.length > 1 ? (
-        invoice?.Payments[0]?.paymentStatus === "Completed" &&
-        invoice?.Payments[1]?.paymentStatus === "Completed" ? (
-          <button
-            disabled
-            style={{
-              padding: "5px 4px",
-              backgroundColor: "GrayText",
-              borderRadius: "8px",
-              marginRight: "10px",
-            }}
-          >
-            Lunas
-          </button>
-        ) : (
-          <button
-            onClick={handleOpenModal}
-            style={{
-              padding: "5px 4px",
-              backgroundColor: "GrayText",
-              borderRadius: "8px",
-              marginRight: "10px",
-            }}
-          >
-            {titleButton}
-          </button>
-        )
-      ) : invoice?.Payments[0]?.paymentStatus === "Completed" ? (
-        <button
-          disabled
-          style={{
-            padding: "5px 4px",
-            backgroundColor: "GrayText",
-            borderRadius: "8px",
-            marginRight: "10px",
-          }}
-        >
-          Lunas
-        </button>
-      ) : (
-        <button
-          onClick={handleOpenModal}
-          style={{
-            padding: "5px 4px",
-            backgroundColor: "GrayText",
-            borderRadius: "8px",
-            marginRight: "10px",
-          }}
-        >
-          {titleButton}
-        </button>
-      )}
-      <div
-        style={{
-          display: "flex",
-          gap: "30px",
-        }}
+      <button
+        onClick={!isAllPaymentsCompleted ? handleOpenModal : undefined}
+        disabled={isAllPaymentsCompleted}
+        style={buttonStyle}
       >
+        {isAllPaymentsCompleted ? "Lunas" : titleButton}
+      </button>
+
+      <div style={containerStyle}>
         {invoice?.status !== "Paid" && (
-          <div
-            style={{
-              marginTop: "30px",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "20px",
-              }}
-            >
-              Status Pengiriman
-            </p>
-            <p
-              style={{
-                fontSize: "14px",
-                padding: "2px",
-                backgroundColor: "ButtonHighlight",
-                width: "150px",
-                textAlign: "center",
-                borderRadius: "10px",
-              }}
-            >
-              {getOrderStatusTranslation(invoice?.Shipment?.shippingStatus)}
+          <div style={sectionStyle}>
+            <p style={titleStyle}>Status Pengiriman</p>
+            <p style={statusStyle}>
+              {getOrderStatusTranslation(shippingStatus)}
             </p>
           </div>
         )}
-        {(invoice?.Shipment?.shippingStatus === "Delivered" ||
-          invoice?.Shipment?.shippingStatus === "Accepted") && (
-          <>
-            <div
-              style={{
-                marginTop: "30px",
-              }}
+        {(shippingStatus === "Delivered" || invoice?.status === "Accepted") && (
+          <div style={sectionStyle}>
+            <p style={titleStyle}>Konfirmasi Pengiriman</p>
+            <Button
+              style={buttonStyleS}
+              disabled={invoice?.status === "Accepted"}
+              onClick={handleUpdateStatus}
             >
-              <p
-                style={{
-                  fontSize: "20px",
-                }}
-              >
-                Konfimasi Pengiriman
-              </p>
+              Saya Diterima
+            </Button>
+          </div>
+        )}
+      </div>
 
+      {/* comentar  */}
+
+      {isAllPaymentsCompleted && (
+        <div>
+          {review?.reviews?.length > 0 ? (
+            <>
+              <p>{"Ulasan Anda"}</p>
+              <p>{`komentar :  ${review?.reviews[0]?.reviewText}`}</p>
+            </>
+          ) : (
+            <>
+              <Form.Label>Berikan Ulasan Anda</Form.Label>
+              <Form.Control
+                type="text"
+                value={writeReview}
+                onChange={(e) => setWriteReview(e.target.value)}
+                required
+              />
               <Button
                 style={{
                   height: "30px",
                   display: "flex",
                   alignItems: "center",
+                  marginTop: "20px",
                 }}
-                disabled={invoice?.Shipment?.shippingStatus !== "Delivered"}
-                onClick={handleUpdateStatus}
+                onClick={createReviewProduct}
               >
-                Saya Diterima
+                Kirim Ulasan
               </Button>
-            </div>
-          </>
-        )}
-      </div>
-      {/* comentar  */}
-      <div>
-        {review?.reviews?.length > 0 ? (
-          <>
-            <p>{"Ulasan Anda"}</p>
-            <p>{`komentar :  ${review?.reviews[0]?.reviewText}`}</p>
-          </>
-        ) : (
-          <>
-            <Form.Label>Berikan Ulasan Anda</Form.Label>
-            <Form.Control
-              type="text"
-              value={writeReview}
-              onChange={(e) => setWriteReview(e.target.value)}
-              required
-            />
-            <Button
-              style={{
-                height: "30px",
-                display: "flex",
-                alignItems: "center",
-                marginTop: "20px",
-              }}
-              onClick={createReviewProduct}
-            >
-              Kirim Ulasan
-            </Button>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      )}
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>

@@ -109,7 +109,9 @@ const Invoice = () => {
         navigate("/order-list");
         alert("pesanan di terima");
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const createReviewProduct = async () => {

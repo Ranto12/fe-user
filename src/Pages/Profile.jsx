@@ -58,7 +58,7 @@ const Profile = ({ currentAvatar, onEditAvatar }) => {
           {/* </Link> */}
 
           <br /> <br />
-          <Link to="/editProfile/:id">
+          <Link to="/editProfile">
             <Button style={{backgroundColor: "#ff98bf", borderColor: '#ff98bf'}}>Edit Profile</Button>
           </Link>
         </Col>

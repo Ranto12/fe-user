@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, InputGroup, FormControl } from "react-bootstrap";
 import { BsChatLeftTextFill } from "react-icons/bs";
-import io from "socket.io-client";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import SlideShowImages from "../../Components/Home/SlideShowImages";
 import CategoryCard from "../../Components/Home/CategoryCard";
@@ -13,66 +11,33 @@ import LayoutImage from "../../Components/Home/LayoutImage";
 import Maps from "../../Components/Home/Maps";
 import "./Home.css";
 
-// Inisialisasi socket.io
-const socket = io("http://localhost:3002");
-
 function Home() {
-  const [userData, setUserData] = useState(null);
   const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([]); // Riwayat chat
   const [showChatModal, setShowChatModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    const fetchUserData = () => {
-      const storedUserData = localStorage.getItem("userData");
-      if (storedUserData) {
-        try {
-          const parsedUserData = JSON.parse(storedUserData);
-          setUserData(parsedUserData);
-        } catch (error) {
-          console.error("Error parsing user data:", error);
-        }
-      }
-    };
-    fetchUserData();
-  }, []);
+  const datauser = JSON.parse(localStorage.getItem("userData"));
 
-  // Pastikan socket terhubung
-  useEffect(() => {
-    socket.on("message", (data) => {
-      if (data.recipient_id === userData?.id) {
-        setChat((prevChat) => [...prevChat, data]);
-      }
-    });
-
-    return () => socket.off("message");
-  }, [userData]);
-
-  // Ambil riwayat pesan dari server
-  const fetchMessages = async (userId) => {
+  const fetchMessagesId = async () => {
     try {
-        const response = await axios.get(
-            `http://localhost:3000/api/messages/user/${userId}`,
-            { withCredentials: true }
-        );
-        console.log("Fetched messages:", response.data); // Cek data yang diterima
-        setChat(response.data.data || []); // Pastikan data adalah array
+      const response = await axios.get(
+        `http://localhost:5000/api/messages/${localStorage.getItem("userId")}`
+      );
+      setMessages(response.data);
     } catch (error) {
-        console.error("Error fetching messages:", error);
-        setChat([]); // Default ke array kosong jika terjadi error
+      console.log(error);
     }
-};
+  };
 
+  useEffect(() => {
+    fetchMessagesId();
+  }, []);
 
   const openChatModal = () => {
     setShowChatModal(true);
     setMessage("");
     setSelectedUser({ email: "admin@example.com", name: "Admin" });
-
-    if (userData?.id) {
-      fetchMessages(userData.id);
-    }
   };
 
   const closeChatModal = () => {
@@ -81,43 +46,28 @@ function Home() {
   };
 
   const handleSendMessage = async () => {
-    if (message.trim()) {
-        try {
-            const payload = {
-                sender_id: userData.id, // ID pengirim
-                recipient_id: 1, // ID admin
-                message: message,
-            };
-
-            await axios.post(
-                "http://localhost:3000/api/messages/sendToAdmin",
-                payload,
-                { withCredentials: true }
-            );
-
-            socket.emit("message", payload);
-
-            setChat((prevChat) => [
-                ...prevChat,
-                { sender: userData.name, message },
-            ]);
-            setMessage("");
-        } catch (error) {
-            console.error("Error sending message:", error);
-        }
+    try {
+      await axios.post(`http://localhost:5000/api/messages/create`, {
+        senderId: localStorage.getItem("userId"),
+        receiverId: 1,
+        message: message,
+      });
+      fetchMessagesId();
+      setMessage("");
+    } catch (error) {
+      console.log(error);
     }
-};
-
+  };
 
   return (
     <div id="home">
       <Navigation />
       <Container className="my-4">
         <div>
-          {userData ? (
+          {datauser ? (
             <div>
-              <h2>Welcome, {userData.name}</h2>
-              <p>Email: {userData.email}</p>
+              <h2>Welcome, {datauser?.name}</h2>
+              <p>Email: {datauser?.email}</p>
             </div>
           ) : (
             <p>Loading user data...</p>
@@ -159,17 +109,31 @@ function Home() {
               backgroundColor: "#FCE4E4", // Background warna pink muda
             }}
           >
-            {chat.length > 0 ? (
-              chat.map((msg, index) => {
-                // Tentukan class berdasarkan apakah pengirim adalah admin atau user
-                const messageClass = [
-                  "message",
-                  msg.sender === "Admin" ? "admin-message" : "user-message",
-                ].join(" ");
-
+            {messages.length > 0 ? (
+              messages.map((msg, index) => {
                 return (
-                  <div key={index} className={messageClass}>
-                    <strong>{msg.sender}</strong> {msg.message}
+                  <div
+                    key={index}
+                    style={{
+                      marginBottom: "10px",
+                      display: "flex",
+                      justifyContent:
+                        msg.sender.role === "admin" ? "flex-start" : "flex-end",
+                    }}
+                  >
+                    <p
+                      style={{
+                        textAlign:
+                          msg.sender.role === "admin" ? "start" : "end",
+                        backgroundColor:
+                          msg.sender.role === "admin" ? "white" : "GrayText",
+                        borderRadius: "10px 0 10px 0",
+                        padding: "5px 10px",
+                        maxWidth: "70%",
+                      }}
+                    >
+                      {msg.message}
+                    </p>
                   </div>
                 );
               })

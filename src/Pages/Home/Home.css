@@ -1,0 +1,84 @@
+/* Bubble Chat */
+.chat-bubble {
+    position: fixed;
+    bottom: 30px; /* Geser lebih jauh dari bawah */
+    right: 30px;  /* Geser lebih jauh dari kanan */
+    background-color: #ff00ea; /* Warna hijau untuk bubble */
+    color: white;
+    border-radius: 50%;
+    padding: 15px;
+    font-size: 28px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 9999;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Efek transisi */position: fixed;
+  }
+  
+  .chat-bubble:hover {
+    background-color: #ffa2f7; /* Warna hijau lebih gelap saat hover */
+    transform: scale(1.1);
+  }
+  
+.bg-pink {
+  background-color: #D85C8C !important; /* Warna latar modal */
+}
+
+.bg-light-pink {
+  background-color: #FCE4E4; /* Warna latar body modal */
+}
+
+.chat-box {
+  background-color: #F8D4D4; /* Background box chat */
+}
+
+.message {
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #FCE4E4; /* Background setiap pesan */
+}
+
+/* CSS untuk chat */
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Menjaga pesan berada di atas */
+  align-items: stretch; /* Membiarkan elemen pesan mengambil lebar penuh */
+  border: 1px solid #D85C8C;
+  height: 300px;
+  overflow-y: scroll;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #FCE4E4;
+}
+
+/* .message {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 60%; /* Lebar pesan dibatasi */
+/* }  */
+
+/* Pesan dari admin (di sebelah kiri) */
+/* .admin-message {
+  background-color: #D85C8C;
+  color: white;
+  text-align: left;
+  margin-left: 20px;
+  margin-right: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  align-self: flex-start; /* Pesan Admin berada di kiri */
+/* } */
+
+/* Pesan dari user (di sebelah kanan) */
+/* .user-message {
+  background-color: #FFC0CB;
+  color: black;
+  text-align: right;
+  margin-left: 10px;
+  margin-right: 20px;
+  padding: 10px;
+  border-radius: 10px; */
+  /* align-self: flex-end;  */
+/* } */

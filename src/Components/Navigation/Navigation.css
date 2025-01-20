@@ -1,0 +1,54 @@
+.custom-navbar {
+    background-color: #ffb3d9; /* Light pink background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-brand {
+    font-weight: bold;
+    font-size: 1.8rem;
+    color: #ff1a75; /* Darker pink for brand */
+  }
+  
+  .nav-link {
+    color: #ff1a75; /* Darker pink for links */
+    cursor: pointer;
+  }
+  
+  .nav-link:hover {
+    color: #ff4d94; /* Lighter pink on hover */
+  }
+  
+  .avatar-image {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    background-color: #fff; /* White background for dropdown */
+    border: 1px solid #ff4d94; /* Light pink border */
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+  
+  .cart-icon, .shop-icon {
+    cursor: pointer;
+    margin-left: 15px;
+    color: #ff1a75; /* Darker pink for icons */
+  }
+  
+  .cart-icon:hover, .shop-icon:hover {
+    color: #ff4d94; /* Lighter pink on hover */
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .custom-navbar {
+      padding: 10px 0;
+    }
+  }
+  

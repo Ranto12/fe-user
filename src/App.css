@@ -1,0 +1,22 @@
+/* CSS untuk navigasi sidebar pada tampilan kecil */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .Profile {
+    padding: 10px;    
+  }
+}

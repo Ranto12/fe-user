@@ -8,6 +8,7 @@ import {
   Modal,
   Button,
   Form,
+  FloatingLabel,
 } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
@@ -21,6 +22,9 @@ const Invoice = () => {
   const [showModal, setShowModal] = useState(false);
   const [review, setReview] = useState();
   const [writeReview, setWriteReview] = useState("");
+  const [paymentType, setPaymentType] = useState("");
+  const [noResi, setNoresi] = useState("");
+  const [alamat, setAlamat] = useState("");
 
   const handleFetchDetailInvoice = async () => {
     try {
@@ -105,7 +109,10 @@ const Invoice = () => {
           orderId: id,
         }
       );
-      if (response.data.message === "Order status and product stock updated successfully") {
+      if (
+        response.data.message ===
+        "Order status and product stock updated successfully"
+      ) {
         navigate("/order-list");
         alert("pesanan di terima");
       }
@@ -178,7 +185,69 @@ const Invoice = () => {
   };
 
   const shippingStatus = invoice?.Shipment?.shippingStatus;
-  console.log(invoice?.status, invoice?.Shipment?.shippingStatus, "cek status")
+  const determinePaymentType = () => {
+    if (invoice?.paymentMethod === "Two-Installments") {
+      const firstPayment = invoice?.Payments[0];
+      const hasPaidDP = firstPayment?.paymentStatus === "Completed";
+
+      if (
+        !hasPaidDP &&
+        (!firstPayment?.images || firstPayment?.images.length === 0)
+      ) {
+        return "Bayar DP";
+      } else if (hasPaidDP && invoice?.Payments[1]?.images.length === 0) {
+        return "Bayar Pelunasan";
+      }
+      return "Tunggu Verifikasi";
+    }
+
+    const allPaymentsCompleted = invoice?.Payments?.every(
+      (payment) => payment.paymentStatus === "Completed"
+    );
+
+    if (invoice?.paymentMethod !== "Two-Installments") {
+      if (!allPaymentsCompleted || !invoice?.Payments[0]?.images?.length) {
+        return "Bayar Lunas";
+      } else if (
+        !allPaymentsCompleted ||
+        invoice?.Payments[0]?.images?.length
+      ) {
+        return "Tunggu Verifikasi";
+      }
+      return "Bayar Lunas";
+    }
+
+    return "Tidak Diketahui";
+  };
+
+  const handleCreateReturnShipment = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/shipments/create/return",
+        {
+          noResi: noResi,
+          address: alamat,
+          orderId: id,
+        }
+      );
+
+      if (response.data.message === "Return shipment created successfully") {
+        alert("success mengembalikan barang");
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      const paymentResult = determinePaymentType();
+      setPaymentType(paymentResult);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoice]);
+
   return (
     <Container className="mt-4">
       <h2>Invoice</h2>
@@ -250,10 +319,14 @@ const Invoice = () => {
       </Row>
       <button
         onClick={!isAllPaymentsCompleted ? handleOpenModal : undefined}
-        disabled={isAllPaymentsCompleted}
+        disabled={isAllPaymentsCompleted || paymentType === "Tunggu Verifikasi"}
         style={buttonStyle}
       >
-        {isAllPaymentsCompleted ? "Lunas" : titleButton}
+        {isAllPaymentsCompleted
+          ? "Lunas"
+          : paymentType === "Tunggu Verifikasi"
+          ? "Tunggu Verifikasi"
+          : titleButton}
       </button>
 
       <div style={containerStyle}>
@@ -270,7 +343,7 @@ const Invoice = () => {
             <p style={titleStyle}>Konfirmasi Pengiriman</p>
             <Button
               style={buttonStyleS}
-              disabled={invoice?.status === "Accepted"}
+              disabled={invoice?.status === "Accepted" || invoice?.status === "Completed"}
               onClick={handleUpdateStatus}
             >
               Saya Diterima
@@ -281,7 +354,46 @@ const Invoice = () => {
 
       {/* comentar  */}
 
-      {isAllPaymentsCompleted && (
+      {(invoice?.status === "Accepted" &&  !invoice?.ReturnShipment )&& (
+        <>
+          <p
+            style={{
+              fontWeight: "bold",
+              marginTop: "20px",
+            }}
+          >
+            Form Pengembalian
+          </p>
+          <Form.Group className="field">
+            <Form.Label>No Resi</Form.Label>
+            <Form.Control
+              type="text"
+              className="input"
+              value={noResi}
+              onChange={(e) => setNoresi(e.target.value)}
+              placeholder="No resi"
+              required
+            />
+          </Form.Group>
+          <Form.Group className="field">
+            <Form.Label>Alamat</Form.Label>
+            <FloatingLabel controlId="floatingTextarea2">
+              <Form.Control
+                as="textarea"
+                placeholder="Alamat lengkap"
+                style={{ height: "100px" }}
+                value={alamat}
+                onChange={(e) => setAlamat(e.target.value)}
+              />
+            </FloatingLabel>
+          </Form.Group>
+          <Button onClick={() => handleCreateReturnShipment()} style={{
+            marginTop: '10px'
+          }}>kembalikan</Button>
+        </>
+      )}
+
+      {invoice?.status === "Completed" && (
         <div>
           {review?.reviews?.length > 0 ? (
             <>

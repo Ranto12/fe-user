@@ -10,6 +10,7 @@ import {
   Modal,
   Form,
   Toast,
+  Carousel,
 } from "react-bootstrap";
 import Navigation from "../../Components/Navigation/Navigation";
 
@@ -21,19 +22,21 @@ const DetailGaun = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [error, setError] = useState(null);
   const [idProductSizes, setIdProductSizes] = useState();
-  const [ulasan, setUlasan] = useState()
+  const [ulasan, setUlasan] = useState();
 
   const { id } = useParams();
   const navigate = useNavigate();
 
   const handlegetDataUlasan = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/reviews/product/${id}`)
-      setUlasan(response.data)
+      const response = await axios.get(
+        `http://localhost:5000/api/reviews/product/${id}`
+      );
+      setUlasan(response.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,14 +70,19 @@ const DetailGaun = () => {
       quantity >
       gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0].stock
     ) {
-      setError(`Jumlah maksimum yang dapat diinput adalah ${gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0].stock}`);
+      setError(
+        `Jumlah maksimum yang dapat diinput adalah ${
+          gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0]
+            .stock
+        }`
+      );
       return;
     }
     if (!idProductSizes) {
       setError(`Pilih Size dulu`);
       return;
     }
-    
+
     try {
       const response = axios.post(
         "http://localhost:5000/api/cart/add",
@@ -127,11 +135,22 @@ const DetailGaun = () => {
         <Row>
           <Col md={6}>
             <Card>
-              <Card.Img
-                variant="top"
-                src={gaun.ProductImages[0].imagePath}
-                alt={`Foto ${gaun.name}`}
-              />
+              <Carousel fade>
+                {gaun?.ProductImages?.map((item) => (
+                  <Carousel.Item>
+                    <Card.Img
+                      variant="top"
+                      src={item.imagePath}
+                      alt={`Foto ${item.imagePath}`}
+                      style={{
+                        width: '100%',
+                        height: '400px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </Carousel.Item>
+                ))}
+              </Carousel>
             </Card>
           </Col>
 
@@ -255,18 +274,25 @@ const DetailGaun = () => {
           <div>
             {ulasan?.reviews?.map((item) => (
               <div>
-               <p style={{
-                fontWeight: 600
-               }}>{item?.user?.name}</p>
-               <p style={{
-                padding: '0 0 0 20px'
-               }}>:   {item?.reviewText}</p>
+                <p
+                  style={{
+                    fontWeight: 600,
+                  }}
+                >
+                  {item?.user?.name}
+                </p>
+                <p
+                  style={{
+                    padding: "0 0 0 20px",
+                  }}
+                >
+                  : {item?.reviewText}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </Container>
-      
     </div>
   );
 };

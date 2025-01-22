@@ -206,16 +206,16 @@ const Invoice = () => {
     );
 
     if (invoice?.paymentMethod !== "Two-Installments") {
-      if (!allPaymentsCompleted || !invoice?.Payments[0]?.images?.length) {
-        return "Bayar Lunas";
+      if (!allPaymentsCompleted || invoice?.Payments[0]?.images?.length) {
+        return "Tunggu Verifikasi";
       } else if (
         !allPaymentsCompleted ||
-        invoice?.Payments[0]?.images?.length
+        !invoice?.Payments[0]?.images?.length
       ) {
-        return "Tunggu Verifikasi";
+        return "Bayar Lunas";
       }
       return "Bayar Lunas";
-    }
+    } 
 
     return "Tidak Diketahui";
   };

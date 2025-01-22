@@ -49,14 +49,14 @@ const Payment = () => {
       return "Tunggu Verifikasi";
     }
 
-    const allPaymentsCompleted = order?.Payments?.every(
-      (payment) => payment.paymentStatus === "Completed"
-    );
 
     if (order?.paymentMethod !== "Two-Installments") {
-      if (!allPaymentsCompleted || !order?.Payments[0]?.images?.length) {
+      if (order?.Payments[0]?.images?.length) {
         setIdPayment(order?.Payments[0]?.id);
         return "Tunggu Verifikasi";
+      } else if (order?.Payments[0].paymentStatus !== "Completed" && !order?.Payments[0]?.images?.length) {
+        setIdPayment(order?.Payments[0]?.id);
+        return "Bayar Lunas"
       }
       return "Bayar Lunas";
     }

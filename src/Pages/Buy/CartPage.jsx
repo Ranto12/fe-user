@@ -15,7 +15,7 @@ import axios from "axios";
 const CartPage = () => {
   const navigate = useNavigate();
   const [cartItem, setCartItems] = useState([]);
-
+ 
   const [selectedItems, setSelectedItems] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [address, setAddress] = useState("");
@@ -148,8 +148,21 @@ const CartPage = () => {
     }
   };
 
+  const getDatauser = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/auth/users/${localStorage.getItem("userId")}`)
+      if (response.data) {
+        setAddress(response?.data?.address);
+        setCustomerName(response?.data?.name);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     handleGetChart();
+    getDatauser();
   }, []);
 
   const handleAddStock = async (id, quantity, quantityProduct) => {

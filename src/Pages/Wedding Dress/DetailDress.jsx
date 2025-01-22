@@ -66,57 +66,62 @@ const DetailGaun = () => {
   }
 
   const handleAddToCart = () => {
-    if (
-      quantity >
-      gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0].stock
-    ) {
-      setError(
-        `Jumlah maksimum yang dapat diinput adalah ${
-          gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0]
-            .stock
-        }`
-      );
-      return;
-    }
     if (!idProductSizes) {
-      setError(`Pilih Size dulu`);
-      return;
-    }
-
-    try {
-      const response = axios.post(
-        "http://localhost:5000/api/cart/add",
-        {
-          productId: parseInt(id),
-          userId: parseInt(localStorage.getItem("userId")),
-          quantity: parseInt(quantity),
-          sizeId: parseInt(idProductSizes),
-          color: gaun?.ProductColors[0]?.color,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("tokenUser")}`,
+      alert("masukan ukuran terlebih dahulu")
+    } else {
+      if (
+        quantity >
+        gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0].stock
+      ) {
+        setError(
+          `Jumlah maksimum yang dapat diinput adalah ${
+            gaun.ProductSizes.filter((item) => item.id === idProductSizes)[0]
+              .stock
+          }`
+        );
+        return;
+      }
+      if (!idProductSizes) {
+        setError(`Pilih Size dulu`);
+        return;
+      }
+  
+      try {
+        const response = axios.post(
+          "http://localhost:5000/api/cart/add",
+          {
+            productId: parseInt(id),
+            userId: parseInt(localStorage.getItem("userId")),
+            quantity: parseInt(quantity),
+            sizeId: parseInt(idProductSizes),
+            color: gaun?.ProductColors[0]?.color,
           },
-        }
-      );
-      console.log(response);
-      navigate("/home");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("tokenUser")}`,
+            },
+          }
+        );
+        console.log(response);
+        navigate("/home");
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      }
+  
+      setToastMessage(`${gaun.nama_produk} telah ditambahkan ke keranjang!`);
+      setShowToast(true);
+  
+      // Atur timer untuk menyembunyikan notifikasi setelah beberapa detik
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+  
+      setShowModal(false);
+      setQuantity(1);
+      setError(null);
     }
-
-    setToastMessage(`${gaun.nama_produk} telah ditambahkan ke keranjang!`);
-    setShowToast(true);
-
-    // Atur timer untuk menyembunyikan notifikasi setelah beberapa detik
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
-
-    setShowModal(false);
-    setQuantity(1);
-    setError(null);
+    
   };
 
   return (

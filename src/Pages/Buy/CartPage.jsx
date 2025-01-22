@@ -26,6 +26,24 @@ const CartPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [duration, setDuration] = useState(1);
 
+  const [datas, setDatas] = useState({
+    shippingMethod: "",
+    province: "",
+    ongkir: 0,
+  });
+
+  const handleProvinceChange = (e) => {
+    const selectedProvince = e.target.value;
+    const provinceData = shippingCosts.find(
+      (province) => province.provinsi === selectedProvince
+    );
+    setDatas({
+      ...datas,
+      province: selectedProvince,
+      ongkir: provinceData.ongkir,
+    });
+  };
+
   const getTotalPrice = () => {
     return cartItem.reduce((total, item) => {
       return selectedItems.includes(item.id)
@@ -47,7 +65,16 @@ const CartPage = () => {
   };
 
   const handleCheckOutClick = async () => {
-    if (!customerName || !address || !telepon || !tanggal || !paymentMethod || !payment || !selectedItems || duration === 0 ) {
+    if (
+      !customerName ||
+      !address ||
+      !telepon ||
+      !tanggal ||
+      !paymentMethod ||
+      !payment ||
+      !selectedItems ||
+      duration === 0
+    ) {
       setErrorMessage("Please fill in all the required fields.");
       return;
     }
@@ -64,15 +91,18 @@ const CartPage = () => {
           rentalStartDate: tanggal,
           rentalDuration: duration,
           cartIds: selectedItems,
-          products: cartItem.filter(item => selectedItems.includes(item.id)).map((item) => ({
-            productId: item.Product.id,
-            productName: item.Product.name,
-            quantity: item.quantity,
-            size: item.ProductSize.size,
-            color: item.color,
-            price: item.Product.price
-          }))
-        },
+          ongkir: datas.ongkir,
+          products: cartItem
+            .filter((item) => selectedItems.includes(item.id))
+            .map((item) => ({
+              productId: item.Product.id,
+              productName: item.Product.name,
+              quantity: item.quantity,
+              size: item.ProductSize.size,
+              color: item.color,
+              price: item.Product.price,
+            })),
+        }
       );
       if (response) {
         navigate("/order-list");
@@ -137,6 +167,53 @@ const CartPage = () => {
       alert("Maximal Stok");
     }
   };
+
+  const shippingCosts = [
+    {
+      provinsi: "Nanggroe Aceh Darussalam (Ibu Kota Banda Aceh)",
+      ongkir: 60000,
+    },
+    { provinsi: "Sumatera Utara (Ibu Kota Medan)", ongkir: 28000 },
+    { provinsi: "Sumatera Selatan (Ibu Kota Palembang)", ongkir: 23000 },
+    { provinsi: "Sumatera Barat (Ibu Kota Padang)", ongkir: 26000 },
+    { provinsi: "Bengkulu (Ibu Kota Bengkulu)", ongkir: 23000 },
+    { provinsi: "Riau (Ibu Kota Pekanbaru)", ongkir: 27000 },
+    { provinsi: "Kepulauan Riau (Ibu Kota Tanjung Pinang)", ongkir: 38000 },
+    { provinsi: "Jambi (Ibu Kota Jambi)", ongkir: 24000 },
+    { provinsi: "Lampung (Ibu Kota Bandar Lampung)", ongkir: 21000 },
+    { provinsi: "Bangka Belitung (Ibu Kota Pangkal Pinang)", ongkir: 6000 },
+    { provinsi: "Kalimantan Barat (Ibu Kota Pontianak)", ongkir: 51000 },
+    { provinsi: "Kalimantan Timur (Ibu Kota Samarinda)", ongkir: 24000 },
+    { provinsi: "Kalimantan Selatan (Ibu Kota Banjarbaru)", ongkir: 29000 },
+    { provinsi: "Kalimantan Tengah (Ibu Kota Palangkaraya)", ongkir: 6000 },
+    { provinsi: "Kalimantan Utara (Ibu Kota Tanjung Selor)", ongkir: 31000 },
+    { provinsi: "Banten (Ibu Kota Serang)", ongkir: 33000 },
+    { provinsi: "DKI Jakarta (Ibu Kota Jakarta)", ongkir: 17000 },
+    { provinsi: "Jawa Barat (Ibu Kota Bandung)", ongkir: 19000 },
+    { provinsi: "Jawa Tengah (Ibu Kota Semarang)", ongkir: 19000 },
+    {
+      provinsi: "Daerah Istimewa Yogyakarta (Ibu Kota Yogyakarta)",
+      ongkir: 20000,
+    },
+    { provinsi: "Jawa Timur (Ibu Kota Surabaya)", ongkir: 22000 },
+    { provinsi: "Bali (Ibu Kota Denpasar)", ongkir: 22000 },
+    { provinsi: "Nusa Tenggara Timur (Ibu Kota Kupang)", ongkir: 30000 },
+    { provinsi: "Nusa Tenggara Barat (Ibu Kota Mataram)", ongkir: 40000 },
+    { provinsi: "Gorontalo (Ibu Kota Gorontalo)", ongkir: 29000 },
+    { provinsi: "Sulawesi Barat (Ibu Kota Mamuju)", ongkir: 55000 },
+    { provinsi: "Sulawesi Tengah (Ibu Kota Palu)", ongkir: 29000 },
+    { provinsi: "Sulawesi Utara (Ibu Kota Manado)", ongkir: 28000 },
+    { provinsi: "Sulawesi Tenggara (Ibu Kota Kendari)", ongkir: 27000 },
+    { provinsi: "Sulawesi Selatan (Ibu Kota Makassar)", ongkir: 40000 },
+    { provinsi: "Maluku Utara (Ibu Kota Sofifi)", ongkir: 97000 },
+    { provinsi: "Maluku (Ibu Kota Ambon)", ongkir: 44000 },
+    { provinsi: "Papua Barat (Ibu Kota Manokwari)", ongkir: 120000 },
+    { provinsi: "Papua (Ibu Kota Jayapura)", ongkir: 82000 },
+    { provinsi: "Papua Tengah (Ibu Kota Nabire)", ongkir: 108000 },
+    { provinsi: "Papua Pegunungan (Ibu Kota Jayawijaya)", ongkir: 108000 },
+    { provinsi: "Papua Selatan (Ibu Kota Merauke)", ongkir: 85000 },
+    { provinsi: "Papua Barat Daya (Ibu Kota Sorong)", ongkir: 130000 },
+  ];
 
   return (
     <>
@@ -292,9 +369,33 @@ const CartPage = () => {
                   required
                 />
               </Form.Group>
-
-              <Form.Group controlId="address">
-                <Form.Label>Address</Form.Label>
+              <Form.Group className="field">
+                <Form.Label>Provinsi</Form.Label>
+                <Form.Select
+                  value={datas.province}
+                  onChange={handleProvinceChange}
+                  required
+                >
+                  <option disabled={datas.province}>Provinsi</option>
+                  {shippingCosts.map((province, index) => (
+                    <option key={index} value={province.provinsi}>
+                      {province.provinsi}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group controlId="Ongkos Kirim">
+                <Form.Label>Ongkos Kirim</Form.Label>
+                <Form.Control
+                  type="text"
+                  disabled
+                  value={formatRupiah(datas.ongkir)}
+                  // onChange={(e) => setAddress(e.target.value)}
+                  required
+                />
+              </Form.Group>
+              <Form.Group controlId="Alamat">
+                <Form.Label>Alamat</Form.Label>
                 <Form.Control
                   type="text"
                   value={address}
@@ -345,9 +446,7 @@ const CartPage = () => {
                   onChange={(e) => setPayment(e.target.value)}
                   required
                 >
-                  <option value="">
-                    Pilih Kategori
-                  </option>
+                  <option value="">Pilih Kategori</option>
                   <option value="Bank Transfer">Bank Transfer</option>
                   <option value="Credit Card">Credit Card</option>
                   <option value="E-Wallet">E-Wallet</option>
@@ -381,7 +480,7 @@ const CartPage = () => {
                 >
                   Remove Selected
                 </Button>
-                <h4>Total: {formatRupiah(getTotalPrice())}</h4>
+                <h4>Total: {formatRupiah(getTotalPrice() + datas.ongkir)}</h4>
                 <Button
                   style={{ backgroundColor: "#ff98bf", borderColor: "#ff98bf" }}
                   onClick={handleCheckOutClick}

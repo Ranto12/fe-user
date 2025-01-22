@@ -24,7 +24,7 @@ const Invoice = () => {
   const [writeReview, setWriteReview] = useState("");
   const [paymentType, setPaymentType] = useState("");
   const [noResi, setNoresi] = useState("");
-  const [alamat, setAlamat] = useState("");
+  const [alamat, setAlamat] = useState("jl. Pangrango no 08 Desa Palangka Kecamatan Jekan Raya Kota Palangka Raya Provinsi Kalimantan Tengah");
 
   const handleFetchDetailInvoice = async () => {
     try {
@@ -382,6 +382,7 @@ const Invoice = () => {
                 as="textarea"
                 placeholder="Alamat lengkap"
                 style={{ height: "100px" }}
+                disabled
                 value={alamat}
                 onChange={(e) => setAlamat(e.target.value)}
               />

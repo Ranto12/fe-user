@@ -24,7 +24,9 @@ const Invoice = () => {
   const [writeReview, setWriteReview] = useState("");
   const [paymentType, setPaymentType] = useState("");
   const [noResi, setNoresi] = useState("");
-  const [alamat, setAlamat] = useState("jl. Pangrango no 08 Desa Palangka Kecamatan Jekan Raya Kota Palangka Raya Provinsi Kalimantan Tengah");
+  const [alamat, setAlamat] = useState(
+    "jl. Pangrango no 08 Desa Palangka Kecamatan Jekan Raya Kota Palangka Raya Provinsi Kalimantan Tengah"
+  );
 
   const handleFetchDetailInvoice = async () => {
     try {
@@ -206,16 +208,15 @@ const Invoice = () => {
     );
 
     if (invoice?.paymentMethod !== "Two-Installments") {
-      if (!allPaymentsCompleted || invoice?.Payments[0]?.images?.length) {
+      if (!allPaymentsCompleted && invoice?.Payments[0]?.images?.length !== 0) {
         return "Tunggu Verifikasi";
       } else if (
-        !allPaymentsCompleted ||
-        !invoice?.Payments[0]?.images?.length
+        !allPaymentsCompleted &&
+        invoice?.Payments[0]?.images?.length === 0
       ) {
-        return "Bayar Lunas";
       }
       return "Bayar Lunas";
-    } 
+    }
 
     return "Tidak Diketahui";
   };
@@ -298,15 +299,32 @@ const Invoice = () => {
                 </tr>
               ))}
               <tr>
+                <td>Ongkir</td>
+                <td></td>
+                <td></td>
+                <td>
+                  {formatRupiah(
+                    invoice?.Payments?.reduce(
+                      (sum, item) => sum + parseInt(item.amount),
+                      0
+                    ) -
+                      invoice?.OrderItems?.reduce(
+                        (sum, item) =>
+                          sum + item.quantity * parseFloat(item.price),
+                        0
+                      )
+                  )}
+                </td>
+              </tr>
+              <tr>
                 <td colSpan="3">
                   <strong>Total</strong>
                 </td>
                 <td>
                   <strong>
                     {formatRupiah(
-                      invoice?.OrderItems?.reduce(
-                        (sum, item) =>
-                          sum + item.quantity * parseFloat(item.price),
+                      invoice?.Payments?.reduce(
+                        (sum, item) => sum + parseInt(item.amount),
                         0
                       )
                     )}
@@ -343,7 +361,10 @@ const Invoice = () => {
             <p style={titleStyle}>Konfirmasi Pengiriman</p>
             <Button
               style={buttonStyleS}
-              disabled={invoice?.status === "Accepted" || invoice?.status === "Completed"}
+              disabled={
+                invoice?.status === "Accepted" ||
+                invoice?.status === "Completed"
+              }
               onClick={handleUpdateStatus}
             >
               Saya Diterima
@@ -354,7 +375,7 @@ const Invoice = () => {
 
       {/* comentar  */}
 
-      {(invoice?.status === "Accepted" &&  !invoice?.ReturnShipment )&& (
+      {invoice?.status === "Accepted" && !invoice?.ReturnShipment && (
         <>
           <p
             style={{
@@ -388,9 +409,14 @@ const Invoice = () => {
               />
             </FloatingLabel>
           </Form.Group>
-          <Button onClick={() => handleCreateReturnShipment()} style={{
-            marginTop: '10px'
-          }}>kembalikan</Button>
+          <Button
+            onClick={() => handleCreateReturnShipment()}
+            style={{
+              marginTop: "10px",
+            }}
+          >
+            kembalikan
+          </Button>
         </>
       )}
 

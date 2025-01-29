@@ -87,7 +87,7 @@ const DetailGaun = () => {
       }
   
       try {
-        const response = axios.post(
+        axios.post(
           "http://localhost:5000/api/cart/add",
           {
             productId: parseInt(id),
@@ -103,7 +103,6 @@ const DetailGaun = () => {
             },
           }
         );
-        console.log(response);
         navigate("/home");
       } catch (error) {
         console.error("Error adding to cart:", error);

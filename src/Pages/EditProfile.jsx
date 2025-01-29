@@ -33,8 +33,6 @@ function EditProfile() {
       getDatauserById()   
   },[])
 
-  console.log(userData, "wkwkw")
-
   return (
     <Container>
       <h2>Edit Profil</h2>

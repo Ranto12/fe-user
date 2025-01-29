@@ -64,7 +64,6 @@ const Invoice = () => {
   useEffect(() => {
     if (invoice?.Payments?.length > 1) {
       if (invoice.Payments[0]?.paymentStatus === "Completed") {
-        console.log("betul");
         setIdpayment(1);
         setTitleButton("Bayar Lunas");
       } else {

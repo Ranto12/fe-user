@@ -25,6 +25,7 @@ const DetailGaun = () => {
   const [ulasan, setUlasan] = useState();
 
   const { id } = useParams();
+  
   const navigate = useNavigate();
 
   const handlegetDataUlasan = async () => {

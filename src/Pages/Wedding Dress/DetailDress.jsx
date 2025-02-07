@@ -13,19 +13,24 @@ import {
   Carousel,
 } from "react-bootstrap";
 import Navigation from "../../Components/Navigation/Navigation";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
 
 const DetailGaun = () => {
   const [gaun, setGaun] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showModalCalendar, setShowModalCaledar] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [error, setError] = useState(null);
   const [idProductSizes, setIdProductSizes] = useState();
   const [ulasan, setUlasan] = useState();
+  const [order, setOrder] = useState([])
 
   const { id } = useParams();
-  
+
   const navigate = useNavigate();
 
   const handlegetDataUlasan = async () => {
@@ -34,6 +39,17 @@ const DetailGaun = () => {
         `http://localhost:5000/api/reviews/product/${id}`
       );
       setUlasan(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlegetDataOrderProduct = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/products/getOrdersByProductId/${id}`
+      );
+      setOrder(response?.data);
     } catch (error) {
       console.log(error);
     }
@@ -57,6 +73,7 @@ const DetailGaun = () => {
       }
     };
 
+    handlegetDataOrderProduct();
     fetchData();
     handlegetDataUlasan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,7 +85,7 @@ const DetailGaun = () => {
 
   const handleAddToCart = () => {
     if (!idProductSizes) {
-      alert("masukan ukuran terlebih dahulu")
+      alert("masukan ukuran terlebih dahulu");
     } else {
       if (
         quantity >
@@ -86,7 +103,7 @@ const DetailGaun = () => {
         setError(`Pilih Size dulu`);
         return;
       }
-  
+
       try {
         axios.post(
           "http://localhost:5000/api/cart/add",
@@ -104,25 +121,29 @@ const DetailGaun = () => {
             },
           }
         );
-        navigate("/home");
+        navigate("/cart");
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
-  
+
       setToastMessage(`${gaun.nama_produk} telah ditambahkan ke keranjang!`);
       setShowToast(true);
-  
+
       // Atur timer untuk menyembunyikan notifikasi setelah beberapa detik
       setTimeout(() => {
         setShowToast(false);
       }, 3000);
-  
+
       setShowModal(false);
       setQuantity(1);
       setError(null);
     }
-    
   };
+
+  const DataEvent = order?.ordersByDate?.map((item) => ({
+    title: item?.quantity + " order",
+    start: item?.date,
+  }));
 
   return (
     <div>
@@ -148,9 +169,9 @@ const DetailGaun = () => {
                       src={item.imagePath}
                       alt={`Foto ${item.imagePath}`}
                       style={{
-                        width: '100%',
-                        height: '400px',
-                        objectFit: 'cover'
+                        width: "100%",
+                        height: "400px",
+                        objectFit: "cover",
                       }}
                     />
                   </Carousel.Item>
@@ -238,14 +259,6 @@ const DetailGaun = () => {
               />
               {error && <small className="text-danger">{error}</small>}
             </Form.Group>
-            {/* <Form.Group>
-              <Form.Label>Tanggal:</Form.Label>
-              <Form.Control
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
-            </Form.Group> */}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>
@@ -255,6 +268,21 @@ const DetailGaun = () => {
               Tambahkan
             </Button>
           </Modal.Footer>
+        </Modal>
+
+        <Modal
+          show={showModalCalendar}
+          onHide={() => setShowModalCaledar(false)}
+          size="xl"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Data Order</Modal.Title>
+          </Modal.Header>
+          <FullCalendar
+            plugins={[dayGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            events={DataEvent && DataEvent}
+          />
         </Modal>
 
         <Toast
@@ -273,9 +301,11 @@ const DetailGaun = () => {
           </Toast.Header>
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
-
         <div>
-          <p>Komentar</p>
+          <Button style={{
+            marginTop: '30px'
+          }} onClick={() => {setShowModalCaledar(true)}}>Liat Jadwal</Button>
+          {ulasan?.reviews && <p>Komentar</p>}
           <div>
             {ulasan?.reviews?.map((item) => (
               <div>

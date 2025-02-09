@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Select from 'react-select';
-import {province as provinceS} from '../../utils'
+import Select from "react-select";
+import { province as provinceS } from "../../utils";
 import {
   Container,
   Row,
@@ -29,7 +29,6 @@ const CartPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [duration, setDuration] = useState(1);
   const [other, setOther] = useState(false);
-
 
   const [datas, setDatas] = useState({
     shippingMethod: "",
@@ -91,7 +90,7 @@ const CartPage = () => {
           userId: localStorage.getItem("userId"),
           customerName: customerName,
           phoneNumber: telepon,
-          address: datas.province + ' ' + district + ' ' + address,
+          address: datas.province + " " + district + " " + address,
           paymentMethod: paymentMethod,
           metodePayment: payment,
           rentalStartDate: tanggal,
@@ -167,7 +166,7 @@ const CartPage = () => {
         const provinceData = provinceS?.find(
           (province) => province?.value === response?.data?.province
         );
-    
+
         setDatas({
           ...datas,
           province: response?.data?.province,
@@ -189,11 +188,11 @@ const CartPage = () => {
       setDistrict("");
       setDatas({
         ...datas,
-        province: '',
+        province: "",
         ongkir: 0,
-      })
+      });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [other]);
 
   const handleAddStock = async (id, quantity, quantityProduct) => {
@@ -378,9 +377,25 @@ const CartPage = () => {
               </Form.Group>
               <Form.Group className="field">
                 <Form.Label>Provinsi</Form.Label>
-                <Select className="pt-4" options={provinceS} defaultInputValue={datas.province} isSearchable placeholder="Pilih Provinsi..." onChange={(e) => handleProvinceChange(e)} />
+                <Select
+                  className="pt-4"
+                  options={provinceS}
+                  defaultInputValue={datas.province}
+                  isSearchable
+                  placeholder="Pilih Provinsi..."
+                  onChange={(e) => handleProvinceChange(e)}
+                />
               </Form.Group>
-              
+              <Form.Group controlId="customerName">
+                <Form.Label>kabupaten</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  required
+                />
+              </Form.Group>
+
               <Form.Group controlId="Ongkos Kirim">
                 <Form.Label>Ongkos Kirim</Form.Label>
                 <Form.Control

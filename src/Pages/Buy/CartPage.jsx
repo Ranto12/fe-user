@@ -390,7 +390,7 @@ const CartPage = () => {
                 <Form.Label>kabupaten</Form.Label>
                 <Form.Control
                   type="text"
-                  value={customerName}
+                  value={district}
                   onChange={(e) => setDistrict(e.target.value)}
                   required
                 />

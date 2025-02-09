@@ -112,7 +112,7 @@ const Profile = ({ currentAvatar, onEditAvatar }) => {
 
               <tr>
                 <th>Alamat</th>
-                <th>{userData?.address}</th>
+                <th>{userData?.province}, {userData?.district}, {userData?.address}</th>
               </tr>
 
               <tr>

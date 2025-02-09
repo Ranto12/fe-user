@@ -1,13 +1,19 @@
 import axios from 'axios';
+import Select from 'react-select';
 import React, { useEffect, useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
+import { province } from '../utils';
+import { useNavigate } from 'react-router-dom';
 
 function EditProfile() {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
     name: '',
     email: '',
     address: '',
-    about: ''
+    about: '',
+    province: '', 
+    district: ''
   })
   const getDatauserById = async () => {
     try {
@@ -23,7 +29,8 @@ function EditProfile() {
       const response = await axios.post(`http://localhost:5000/api/auth/update/${localStorage.getItem("userId")}`, userData)
       setUserData(response.data)
       alert("update succes")
-      getDatauserById()   
+      getDatauserById()
+      navigate('/Profile')
     } catch (error) {
       console.log(error);
     }
@@ -41,6 +48,16 @@ function EditProfile() {
         <Form.Group controlId="formBasicName">
           <Form.Label>Nama</Form.Label>
           <Form.Control type="text" placeholder="Masukkan nama Anda" value={userData.name} onChange={(e) => setUserData({...userData, name: e.target.value})} />
+        </Form.Group>
+
+        <Form.Group controlId="formBasicName">
+          <Form.Label>Nama</Form.Label>
+          <Select options={province} defaultInputValue={userData.province} isSearchable placeholder="Pilih Provinsi..." onChange={(e) => setUserData({...userData, province: e.value})} />
+        </Form.Group>
+
+        <Form.Group controlId="formBasicName">
+          <Form.Label>Kabupaten</Form.Label>
+          <Form.Control type="text" placeholder="Masukkan nama Anda" value={userData.district} onChange={(e) => setUserData({...userData, district: e.target.value})} />
         </Form.Group>
 
         <Form.Group controlId="formBasicEmail">
